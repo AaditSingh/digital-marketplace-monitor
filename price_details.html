@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price History & Alerts</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Price History & Alerts</h2>
+        
+        <div class="product-info">
+            <img src="product-image.jpg" alt="Product Image">
+            <div>
+                <h3>Sample Product Name</h3>
+                <p>Current Price: <span class="price">$199</span></p>
+            </div>
+        </div>
+
+        <div class="chart">
+            <p>📊 Price Trend Graph (Placeholder)</p>
+        </div>
+
+        <h3>Price History</h3>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Price</th>
+                <th>Change</th>
+            </tr>
+            <tr>
+                <td>Feb 1, 2025</td>
+                <td>$199</td>
+                <td>-5%</td>
+            </tr>
+            <tr>
+                <td>Jan 25, 2025</td>
+                <td>$210</td>
+                <td>-2%</td>
+            </tr>
+        </table>
+
+        <h3>Set Price Drop Alert</h3>
+        <input type="number" id="alertPrice" placeholder="Price-alert cost">
+        <button class="track-btn">Save Alert</button>
+    </div>
+</body>
+</html>

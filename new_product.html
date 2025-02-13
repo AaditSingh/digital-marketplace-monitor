@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track New Product</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Track a New Product</h2>
+        <div class="form-group">
+            <label>Product URL:</label>
+            <input type="text" id="productUrl" placeholder="Enter e-commerce product URL">
+            <button onclick="fetchProduct()">Fetch Product</button>
+        </div>
+
+        <div class="form-group">
+            <label>Product Name:</label>
+            <input type="text" id="productName" placeholder="Product Name" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>Set Price Range:</label>
+            <input type="number" id="minPrice" placeholder="Min Price">
+            <hr>
+            <input type="number" id="maxPrice" placeholder="Max Price">
+        </div>
+
+        <div class="form-group">
+            <label>Tracking Frequency:</label>
+            <select id="frequency">
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Price Drop Alert Value:</label>
+            <input type="number" id="alertPrice" placeholder="Notify when price drops below">
+        </div>
+
+        <button class="track-btn">Start Tracking</button>
+    </div>
+
+    <script>
+        function fetchProduct() {
+            document.getElementById("productName").value = "Sample Product Name";
+        }
+    </script>
+</body>
+</html>
