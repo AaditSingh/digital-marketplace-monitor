@@ -9,7 +9,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    background: linear-gradient(135deg, #007bff, #00f2fe);
+    /* background: #007bff; */
     padding: 20px;
 }
 .container {
