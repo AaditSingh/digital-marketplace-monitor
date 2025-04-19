@@ -3,47 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Price History & Alerts</title>
+    <title>Price History</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h2>Price History & Alerts</h2>
-        
-        <div class="product-info">
-            <img src="product-image.jpg" alt="Product Image">
+        <h2>Price History</h2>
+
+        <div class="product-info" style="display: flex; align-items: center; gap: 20px;">
             <div>
-                <h3>Sample Product Name</h3>
-                <p>Current Price: <span class="price">$199</span></p>
+                <h3 id="productName">Sample Product</h3>
+                <p>Current Price: <span class="price" id="productPrice">₹0</span></p>
             </div>
         </div>
 
-        <div class="chart">
-            <p>📊 Price Trend Graph (Placeholder)</p>
-        </div>
-
         <h3>Price History</h3>
-        <table>
+        <table id="priceHistoryTable" border="1" cellspacing="0" cellpadding="10">
             <tr>
                 <th>Date</th>
                 <th>Price</th>
                 <th>Change</th>
             </tr>
-            <tr>
-                <td>Feb 1, 2025</td>
-                <td>$199</td>
-                <td>-5%</td>
-            </tr>
-            <tr>
-                <td>Jan 25, 2025</td>
-                <td>$210</td>
-                <td>-2%</td>
-            </tr>
         </table>
-
-        <h3>Set Price Drop Alert</h3>
-        <input type="number" id="alertPrice" placeholder="Price-alert cost">
-        <button class="track-btn">Save Alert</button>
+        <br>
+        <br>
+        <button class="btn" onclick="goToDashboard()">Go to Dashboard</button>
     </div>
+
+    <script>
+    async function loadProductDetails() {
+        const encodedUrl = localStorage.getItem("selectedProductURL");
+        if (!encodedUrl) {
+            alert("No product selected.");
+            return;
+        }
+
+        const url = decodeURIComponent(encodedUrl);
+        const res = await fetch(`http://127.0.0.1:5000/product?url=${encodeURIComponent(url)}`);
+        const product = await res.json();
+
+        if (product.status === "error") {
+            alert(product.message);
+            return;
+        }
+
+        document.getElementById("productName").innerText = product.name;
+        document.getElementById("productPrice").innerText = `₹${product.current_price}`;
+
+        const table = document.getElementById("priceHistoryTable");
+        table.innerHTML = `
+            <tr>
+                <th>Date</th>
+                <th>Price</th>
+                <th>Change</th>
+            </tr>
+        `;
+
+        const history = product.price_history;
+        for (let i = 0; i < history.length; i++) {
+            const { date, price, change = "-" } = history[i];
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>₹${price}</td>
+                <td>${change}</td>
+            `;
+            table.appendChild(row);
+        }
+    }
+
+    function goToDashboard() {
+        window.location.href = "dashboard_page.html";
+    }
+
+    loadProductDetails();
+    </script>
 </body>
 </html>
