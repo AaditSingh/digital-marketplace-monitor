@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - MyApp</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
@@ -12,7 +12,7 @@
             margin: 0;
             font-family: 'Poppins', sans-serif;
             background: #f4f6f9;
-        }
+        }   
         .sidebar {
             width: 250px;
             background: #007bff;
@@ -28,7 +28,6 @@
             padding: 10px;
             display: block;
             border-radius: 5px;
-            /* transition: background 0.3s; */
         }
         .sidebar a:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -88,12 +87,19 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>MyApp</h2>
+        <br>
         <a href="dashboard_page.html">Dashboard</a>
         <a href="new_product.html">Track New Product</a>
         <a href="price_details.html">Alerts</a>
         <a href="#">Settings</a>
         <a href="login_page.html">Logout</a>
+        <div id="chatbot-container">
+            <h3>Chatbot</h3>
+            <div id="chatbot-messages">
+            </div>
+            <input type="text" id="chatbot-input" placeholder="Type your message..." />
+            <button id="chatbot-send">Send</button>
+        </div>
     </div>
     <div class="content">
         <div class="top-nav">
@@ -116,30 +122,119 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="products">
-                        <td>Product 1</td>
-                        <td>$99.99</td>
-                        <td>2025-02-10</td>
-                        <td>-5%</td>
-                        <td>
-                            <button class="btn btn-view">View</button>
-                            <button class="btn btn-remove">Remove</button>
-                        </td>
-                    </tr>
-                    <tr class="products">
-                        <td>Product 2</td>
-                        <td>$149.99</td>
-                        <td>2025-02-12</td>
-                        <td>+3%</td>
-                        <td>
-                            <button class="btn btn-view">View</button>
-                            <button class="btn btn-remove">Remove</button>
-                        </td>
-                    </tr>
+                <tbody id="productTable">
+                    <!-- JavaScript will inject rows here -->
                 </tbody>
             </table>
+            
         </div>
     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQ4SYNUgD2GxI_1XwwN4zihJMsy3c3BHQ",
+            authDomain: "authen1234-67d08.firebaseapp.com",
+            projectId: "authen1234-67d08",
+            storageBucket: "authen1234-67d08.appspot.com",
+            messagingSenderId: "335923850084",
+            appId: "1:335923850084:web:authen1234-67d08"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Protect Dashboard
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login_page.html";
+            }
+        });
+
+        // Logout Buttons
+        const logoutBtns = [document.getElementById("logout-top"), document.getElementById("logout-sidebar")];
+        logoutBtns.forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                await signOut(auth);
+                alert("Logged out!");
+                window.location.href = "login_page.html";
+            });
+        });
+
+        // Profile Button Navigation
+        const profileBtn = document.getElementById("profile-btn");
+        profileBtn.addEventListener("click", () => {
+            window.location.href = "profile.html";
+        });
+
+        async function loadDashboardData() {
+            const response = await fetch("http://127.0.0.1:5000/dashboard");
+            const products = await response.json();
+            const table = document.getElementById("productTable");
+            table.innerHTML = "";
+        
+            products.forEach(p => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${p.name}</td>
+                    <td>₹${p.current_price}</td>
+                    <td>${p.price_history[p.price_history.length - 1]?.date || "N/A"}</td>
+                    <td>
+                        ${
+                            p.price_history.length > 1
+                            ? calculatePriceChange(p.price_history)
+                            : "-"
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-view" onclick="viewProduct('${encodeURIComponent(p.url)}')">View</button>
+                        <button class="btn btn-remove" onclick="removeProduct('${encodeURIComponent(p.url)}')">Remove</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function calculatePriceChange(history) {
+            const latest = history[history.length - 1].price;
+            const previous = history[history.length - 2].price;
+            const change = (((latest - previous) / previous) * 100).toFixed(1);
+            return (change > 0 ? "+" : "") + change + "%";
+        }
+        
+        loadDashboardData();
+
+        async function removeProduct(encodedUrl) {
+            const url = decodeURIComponent(encodedUrl);
+
+            const confirmDelete = confirm("Remove this product?");
+            if (!confirmDelete) return;
+
+            const res = await fetch("http://127.0.0.1:5000/remove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            loadDashboardData(); // refresh table
+        }
+
+
+            
+        function viewProduct(url) {
+        localStorage.setItem("selectedProductURL", encodeURIComponent(url));
+        window.location.href = "price_details.html";
+        }
+
+        
+
+        
+
+        </script>
+        
 </body>
 </html>
