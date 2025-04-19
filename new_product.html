@@ -41,12 +41,64 @@
             <input type="number" id="alertPrice" placeholder="Notify when price drops below">
         </div>
 
-        <button class="track-btn">Start Tracking</button>
+        <button class="track-btn" onclick="submitProduct()">Start Tracking</button>
+        <br>
+        <br>
+        <button class="btn" onclick="goToDashboard()">Go to Dashboard</button>
     </div>
 
     <script>
-        function fetchProduct() {
-            document.getElementById("productName").value = "Sample Product Name";
+        // Fetch product title from Flipkart using /scrape
+        async function fetchProduct() {
+            const url = document.getElementById("productUrl").value;
+            if (!url) return alert("Please enter a product URL");
+    
+            const res = await fetch("http://127.0.0.1:5000/scrape", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url })
+            });
+    
+            const result = await res.json();
+            if (result.status === "success") {
+                document.getElementById("productName").value = result.title;
+            } else {
+                alert("Failed to fetch product info.");
+            }
+        }
+    
+        // Send form data to /track (scraper runs again for price)
+        async function submitProduct() {
+            const url = document.getElementById("productUrl").value;
+            const minPrice = document.getElementById("minPrice").value;
+            const maxPrice = document.getElementById("maxPrice").value;
+            const frequency = document.getElementById("frequency").value;
+            const alertPrice = document.getElementById("alertPrice").value;
+    
+            if (!url || !minPrice || !maxPrice || !alertPrice) {
+                alert("Please fill all required fields.");
+                return;
+            }
+    
+            const response = await fetch("http://127.0.0.1:5000/track", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    url,
+                    min_price: minPrice,
+                    max_price: maxPrice,
+                    frequency,
+                    alert_price: alertPrice
+                })
+            });
+    
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        // Navigate to dashboard
+        function goToDashboard() {
+            window.location.href = "dashboard_page.html";
         }
     </script>
 </body>
