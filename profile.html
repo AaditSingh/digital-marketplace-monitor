@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0066ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .profile-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #login-id {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        <p>Your Login ID:</p>
+        <p id="login-id">Loading...</p>
+        <a href="dashboard_page.html">Back to Dashboard</a>
+    </div>
+
+    <script type="module">
+        import { auth } from './firebaseConfig.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Display user email or uid as login ID
+                const loginIdElem = document.getElementById('login-id');
+                loginIdElem.textContent = user.email || user.uid || "Unknown User";
+            } else {
+                // No user is signed in, redirect to login page
+                window.location.href = "login_page.html";
+            }
+        });
+    </script>
+</body>
+
+</html>
